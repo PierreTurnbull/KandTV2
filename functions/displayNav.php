@@ -1,35 +1,38 @@
 <?php
 /**
- * Calls displayLi() for each item contained in $data, and passes this item to the function as a parameter
- * @param array $data
+ * Retrieves nav data and passes each row of the PDOStatement returned as argument to the function displayLi()
+ * @param PDO $connection
  */
-function displayEveryLi(array &$data) : void
+function displayEveryLi(PDO &$connection) : void
 {
-  foreach ($data as $dataItem) {
-    displayLi($dataItem);
-  }
+    // Retrieves data
+    $stmt = retrievePageNavData($connection);
+    // Calls to displayLi()
+    while ($dataItem = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        displayLi($dataItem);
+    }
 }
 
 /**
  * Fills an HTML li with informations passed as an array in the parameter and puts it in the DOM
  * @param array $dataItem
  */
-function displayLi(array $dataItem) : void
+function displayLi(array &$dataItem) : void
 {
-  // Add active class to li if it corresponds to the current page
+  // Adds active class to li if it corresponds to the current page
   $active = "";
   if (!isset($_GET["page"]) && $dataItem["slug"] === "") {
     $active = " class='active'";
   } else if (isset($_GET["page"]) && $dataItem["slug"] === "page=" . $_GET["page"]) {
     $active = " class='active'";
   }
-  // Add the corresponding slug in the link if needed
+  // Adds the corresponding slug in the link if needed
   $slugs = "";
   if ($dataItem["slug"]) {
       $slugs = "?" . $dataItem["slug"];
   }
   $slug = "";
-  // Display li
+  // Displays li
   ?>
   <li<?= $active ?>>
     <a href="index.php<?= $slugs ?>">
